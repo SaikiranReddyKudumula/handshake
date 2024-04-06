@@ -7,7 +7,7 @@ app = Flask(__name__)
 CORS(app)
 
 processor = JobDescriptionProcessor(
-    openai_api_key="", mistral_api_key="")
+    openai_api_key="<insert your own key>", mistral_api_key="<insert your own key>")
 
 
 @app.route('/get-job-matching-insights', methods=['GET'])
