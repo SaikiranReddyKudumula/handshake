@@ -79,7 +79,7 @@ class JobDescriptionProcessor:
 #     # Specify the path to your job description file
 #     file_path = "job_description.txt"
 #     processor = JobDescriptionProcessor(
-#         openai_api_key="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", mistral_api_key="")
+#         openai_api_key="", mistral_api_key="")
 
 #     try:
 #         job_description = processor.get_job_description_from_file(file_path)
