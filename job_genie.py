@@ -2,6 +2,10 @@ from langchain_openai.chat_models import ChatOpenAI
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain.prompts import PromptTemplate
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 
 class ANSWERS(BaseModel):
@@ -50,9 +54,10 @@ class JobGenie:
 if __name__ == "__main__":
     file_path = "job_description.txt"
     processor = JobGenie(
-        openai_api_key="")
+        openai_api_key=os.getenv("OPENAI_API_KEY"))
     try:
         answer = processor.answer_question(
             "What skills are required for this job?")
+        print(answer)
     except FileNotFoundError as e:
         print(e)

@@ -3,18 +3,21 @@ from flask_cors import CORS
 from job_description_processor import JobDescriptionProcessor
 from job_genie import JobGenie
 from validate_answers import ValidateAnswers
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
 processor = JobDescriptionProcessor(
-    openai_api_key="", mistral_api_key="<insert your own key>")
+    openai_api_key=os.getenv("OPENAI_API_KEY"), mistral_api_key=os.getenv("MISTRAL_API_KEY"))
 assistant = JobGenie(
-    openai_api_key="", mistral_api_key="")
+    openai_api_key=os.getenv("OPENAI_API_KEY"))
 
 validate = ValidateAnswers(
-    openai_api_key="", mistral_api_key="")
+    openai_api_key=os.getenv("OPENAI_API_KEY"), mistral_api_key=os.getenv("MISTRAL_API_KEY"))
 
 
 @app.route('/get-job-matching-insights', methods=['GET'])
@@ -35,12 +38,18 @@ def get_questions():
         return jsonify({"error": str(e)}), 400
 
 
-@app.route('/submit-answer', methods=['POST'])
+@app.route('/submit-answer', methods=['GET'])
 def submit_answer():
-    #Assuming the format of the json is {'question':'answer'}
-    answers = request.json
+    # Assuming the format of the json is {'question':'answer'}
+    answers = {
+        "What does JDBC stand for?": "Sreeram",
+        "Which method is used to start a thread in Java?": "start()",
+        "What is the default transaction isolation level in JDBC?": "TRANSACTION_READ_COMMITTED",
+        # Incorrect for demonstration
+        "How can you retrieve the auto-generated keys after an INSERT statement in SQL?": "Using getGeneratedKeys() method of Statement object.",
+        "What is the main difference between 'INNER JOIN' and 'LEFT JOIN' in SQL?": "INNER JOIN returns rows when there is at least one match in both tables. LEFT JOIN returns all rows from the left table, and the matched rows from the right table; if there is no match, the result is NULL on the right side."  # Incorrect for demonstration
+    }
     result = validate.process_submitted_answers(answers)
-    #result is a acknowledgement message
     return result
 
 
