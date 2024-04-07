@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from job_description_processor import JobDescriptionProcessor
 from job_genie import JobGenie
+from validate_answers import ValidateAnswers
+
 
 app = Flask(__name__)
 CORS(app)
@@ -9,7 +11,10 @@ CORS(app)
 processor = JobDescriptionProcessor(
     openai_api_key="", mistral_api_key="<insert your own key>")
 assistant = JobGenie(
-    openai_api_key="")
+    openai_api_key="", mistral_api_key="")
+
+validate = ValidateAnswers(
+    openai_api_key="", mistral_api_key="")
 
 
 @app.route('/get-job-matching-insights', methods=['GET'])
@@ -21,7 +26,7 @@ def get_job_matching_insights():
 def get_questions():
     try:
         job_description = processor.get_job_description_from_file(
-            "job_description.txt")
+            "non_tech.txt")
         questions = processor.generate_questions_from_jd(
             job_description)
 
@@ -32,8 +37,11 @@ def get_questions():
 
 @app.route('/submit-answer', methods=['POST'])
 def submit_answer():
-    result = {"correct": True, "message": "Your answer is correct!"}
-    return jsonify(result)
+    #Assuming the format of the json is {'question':'answer'}
+    answers = request.json
+    result = validate.process_submitted_answers(answers)
+    #result is a acknowledgement message
+    return result
 
 
 @app.route('/job-genie', methods=['POST'])
