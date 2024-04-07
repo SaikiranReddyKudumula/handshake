@@ -22,8 +22,21 @@ validate = ValidateAnswers(
 
 @app.route('/get-job-matching-insights', methods=['GET'])
 def get_job_matching_insights():
-    return jsonify({"message": "Job matching insights placeholder"})
-
+    if 'resume' not in request.files:
+        return jsonify({"error": "Resume file is required."}), 400
+    resume_file = request.files['resume']
+    try:
+        resume_text = resume_file.read().decode('utf-8')
+        matching_skills, non_matching_skills, match_percentage = analyze_resume_match(resume_text)
+        
+        response = {
+            "MatchingSkills": list(matching_skills),
+            "SkillsNotInResume": list(non_matching_skills),
+            "MatchPercentage": match_percentage
+        }
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/get-questions', methods=['GET'])
 def get_questions():
