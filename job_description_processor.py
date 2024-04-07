@@ -8,6 +8,16 @@ from langchain.prompts import PromptTemplate
 from langchain_mistralai.chat_models import ChatMistralAI
 
 
+class NON_TECHNICAL_SKILLS(BaseModel):
+    options: List[str] = Field(
+        description="A list of all non-technical skills extracted from the job description."
+    )
+
+class CATEGORY(BaseModel):
+    options: str = Field(
+        description="A word techincal or non-technical based on the job description"
+    )
+
 class SKILLS(BaseModel):
     options: List[str] = Field(
         description="A list of all technical skills extracted from the job description.")
@@ -17,8 +27,7 @@ class MCQ(BaseModel):
     question: str = Field(description="The multiple-choice question")
     options: List[str] = Field(
         description="A list of all answer options, correct and incorrect mixed")
-
-
+    
 class JobDescriptionProcessor:
     def __init__(self, openai_api_key: str, mistral_api_key: str):
         self.lang_chain_openai = ChatOpenAI(
@@ -33,13 +42,39 @@ class JobDescriptionProcessor:
         with open(file_path, 'r', encoding='utf-8') as file:
             job_description = file.read()
         return job_description
-
-    def extract_skills(self, job_description: str) -> List[str]:
+    
+    def job_category(self, job_description: str) -> str:
         template = """
-        system:You are an assistant knowledgeable in identifying technical skills from job descriptions. Your task is to analyze the provided job description and list only the core technical skills mentioned. Focus on programming languages, engineering practices, and any tools or technologies specified that can be generalized or observed in resumes. Avoid including general skills or attributes that are not technical in nature.
+        system:You are an assistant knowledgeable in identifying the job description and categorizing it as technical or non-technical. Your task is to analyze the provided job description and tell if it is technical or non-technical. Your output should be one word techinal or non-technical
         job description: {query}\n{format_instructions}\n
         """
-        parser = JsonOutputParser(pydantic_object=SKILLS)
+        parser = JsonOutputParser(pydantic_object=CATEGORY)
+        prompt = PromptTemplate(
+            template=template,
+            input_variables=["query"],
+            partial_variables={
+                "format_instructions": parser.get_format_instructions()},
+        )
+        runnable = prompt | self.lang_chain_openai | parser
+        result = runnable.invoke({"query": job_description})
+        return result['options']
+
+    def extract_skills(self, job_description: str, category: str) -> List[str]:
+        if(category == "technical"):
+            template = """
+            system:You are an assistant knowledgeable in identifying technical skills from job descriptions. Your task is to analyze the provided job description and list only the core technical skills mentioned. Focus on programming languages, engineering practices, and any tools or technologies specified that can be generalized or observed in resumes. Avoid including general skills or attributes that are not technical in nature.
+            job description: {query}\n{format_instructions}\n
+            """
+        elif(category == "non-technical"):
+            template = """
+            system:You are an assistant knowledgeable in identifying core non-technical skills and qualities from job descriptions. Your task is to analyze the provided job description and list only the key non-technical skills and attributes mentioned. Focus on project management, leadership, strategic planning, communication skills, and any other soft skills or business-oriented skills specified that can be generalized or observed in resumes. Avoid including specific technical skills or technologies.
+            job description: {query}\n{format_instructions}\n
+            """
+        parser = None
+        if(category == "technical"):
+            parser = JsonOutputParser(pydantic_object=SKILLS)
+        elif(category == "non-technical"):
+            parser = JsonOutputParser(pydantic_object=NON_TECHNICAL_SKILLS)
         prompt = PromptTemplate(
             template=template,
             input_variables=["query"],
@@ -55,7 +90,9 @@ class JobDescriptionProcessor:
         return result['options']
 
     def generate_questions_from_jd(self, job_description: str) -> List[dict]:
-        skills = self.extract_skills(job_description)
+        category = self.job_category(job_description)
+        print(category)
+        skills = self.extract_skills(job_description, category)
         questions = []
         for skill in skills[:5]:  # Generate questions for the first 5 skills
             mcq_query = f"Generate a beginner-level multiple-choice question that tests the basic understanding of {skill}. Include one correct answer and three plausible but incorrect options."
@@ -74,18 +111,17 @@ class JobDescriptionProcessor:
                 questions.append(result)
         return questions
 
+#if __name__ == "__main__":
+    # Specify the path to your job description file
+    # file_path = "job_description.txt"
+    # processor = JobDescriptionProcessor(
+    #     openai_api_key="<OPENAI_key>", mistral_api_key="<mistralAI_key>")
 
-# if __name__ == "__main__":
-#     # Specify the path to your job description file
-#     file_path = "job_description.txt"
-#     processor = JobDescriptionProcessor(
-#         openai_api_key="<insert your own key>", mistral_api_key="<insert your own key>")
-
-#     try:
-#         job_description = processor.get_job_description_from_file(file_path)
-#         print("Job Description:", job_description)
-#         questions = processor.generate_questions_from_jd(job_description)
-#         for question in questions:
-#             print(question)
-#     except FileNotFoundError as e:
-#         print(e)
+    # try:
+    #     job_description = processor.get_job_description_from_file(file_path)
+    #     print("Job Description:", job_description)
+    #     questions = processor.generate_questions_from_jd(job_description)
+    #     for question in questions:
+    #         print(question)
+    # except FileNotFoundError as e:
+    #     print(e)
