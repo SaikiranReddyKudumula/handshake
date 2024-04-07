@@ -3,6 +3,7 @@ from flask_cors import CORS
 from job_description_processor import JobDescriptionProcessor
 from job_genie import JobGenie
 from validate_answers import ValidateAnswers
+from resume import fetch_job_skills_from_api, find_matching_skills
 import os
 from dotenv import load_dotenv
 
@@ -22,13 +23,23 @@ validate = ValidateAnswers(
 
 @app.route('/get-job-matching-insights', methods=['GET'])
 def get_job_matching_insights():
-    if 'resume' not in request.files:
-        return jsonify({"error": "Resume file is required."}), 400
-    resume_file = request.files['resume']
+    # Define the path to your static resume file
+    resume_file_path = 'resume.txt'
+    
     try:
-        resume_text = resume_file.read().decode('utf-8')
-        matching_skills, non_matching_skills, match_percentage = analyze_resume_match(resume_text)
+        # Ensure the file exists
+        if not os.path.exists(resume_file_path):
+            return jsonify({"error": "Resume file not found."}), 404
         
+        # Read the resume text from the file
+        with open(resume_file_path, 'r', encoding='utf-8') as file:
+            resume_text = file.read()
+        
+        # Fetch job skills and process the resume text
+        job_skills = fetch_job_skills_from_api()
+        matching_skills, non_matching_skills, match_percentage = find_matching_skills(resume_text, job_skills)
+
+        # Prepare and send the response
         response = {
             "MatchingSkills": list(matching_skills),
             "SkillsNotInResume": list(non_matching_skills),
@@ -37,18 +48,6 @@ def get_job_matching_insights():
         return jsonify(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-@app.route('/get-questions', methods=['GET'])
-def get_questions():
-    try:
-        job_description = processor.get_job_description_from_file(
-            "non_tech.txt")
-        questions = processor.generate_questions_from_jd(
-            job_description)
-
-        return jsonify(questions)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
 
 
 @app.route('/submit-answer', methods=['GET'])
