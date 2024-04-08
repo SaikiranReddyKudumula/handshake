@@ -3,6 +3,7 @@ from flask_cors import CORS
 from job_description_processor import JobDescriptionProcessor
 from job_genie import JobGenie
 from validate_answers import ValidateAnswers
+from job_insights import find_matching_skills
 import os
 from dotenv import load_dotenv
 
@@ -22,13 +23,20 @@ validate = ValidateAnswers(
 
 @app.route('/get-job-matching-insights', methods=['GET'])
 def get_job_matching_insights():
-    if 'resume' not in request.files:
-        return jsonify({"error": "Resume file is required."}), 400
-    resume_file = request.files['resume']
+    resume_file_path = 'resume.txt'
     try:
-        resume_text = resume_file.read().decode('utf-8')
-        matching_skills, non_matching_skills, match_percentage = analyze_resume_match(resume_text)
-        
+        if not os.path.exists(resume_file_path):
+            return jsonify({"error": "Resume file not found."}), 404
+        with open(resume_file_path, 'r', encoding='utf-8') as file:
+            resume_text = file.read()
+        job_description = processor.get_job_description_from_file(
+            "tech.txt")
+        category = processor.job_category(job_description)
+        job_skills = processor.extract_skills(job_description, category)
+        print("@job_skills", job_skills)
+        matching_skills, non_matching_skills, match_percentage = find_matching_skills(
+            resume_text, job_skills)
+
         response = {
             "MatchingSkills": list(matching_skills),
             "SkillsNotInResume": list(non_matching_skills),
@@ -37,6 +45,7 @@ def get_job_matching_insights():
         return jsonify(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/get-questions', methods=['GET'])
 def get_questions():

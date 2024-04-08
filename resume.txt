@@ -2,7 +2,7 @@
         skudumul@gmu.edu | 7039092042 | Fairfax, VA | LinkedIn | Github | Portfolio 
 
 PROFESSIONAL SUMMARY
-Dynamic and results-oriented full-stack software engineer with over 4 years of professional experience. Expert in leading the development of scalable web and mobile applications utilizing forefront technologies including React, React Native, Node.js, and AWS. Demonstrates exceptional leadership by guiding high-performing teams toward the successful execution of innovative product solutions. Skilled in enhancing application performance and user engagement through sophisticated state management, API integrations, and the application of agile methodologies.
+Dynamic and results-oriented full-stack software engineer with over 4 years of professional experience. Expert in leading the development of scalable web and mobile applications utilizing forefront technologies including React, React Native, Node.js, and AWS. Demonstrates exceptional leadership by guiding high-performing teams toward the successful execution of innovative solutions. Skilled in enhancing application performance and user engagement through sophisticated state management, API integrations, and the application of agile methodologies.
 
 EDUCATION
 George Mason University, Fairfax, VA
@@ -24,7 +24,7 @@ dynamic user interfaces.
 ● Participating in the Sprint Planning and User Story Grooming sessions and suggesting can-do and cannot-do in each Sprint. Software Development Engineer
 ● Developed and launched robust single-page web applications and mobile apps using React.js and React-Native, integrating responsive design
 ● with HTML5, CSS3, and Bootstrap, and enhancing functionality with Redux for state management.
-● Pioneered the adoption of CI/CD processes and pipelines using Jenkins and AWS DevOps, accelerating product delivery cycles and enhancing
+● Pioneered the adoption of CI/CD processes and pipelines using Jenkins and AWS DevOps, accelerating delivery cycles and enhancing
 code quality.
 ● Streamlined build and deployment processes using Webpack, NPM for package management, and Firebase for build sharing, with a focus on
 cross-browser compatibility and proactive participation in Sprint Planning and User Story Grooming sessions.
@@ -39,7 +39,7 @@ Software Developer
 testing tools such as Jest, Mocha, and Chai, significantly reducing the occurrence of bugs and enhancing software reliability.
 Software Trainee
 ● Developed responsive UI for customer-facing web pages using Bootstrap and ReactJs; managed source code with Git and maintained documentation in Confluence.
-● Contributed to a cross-functional team to align product visions with engineering capabilities, ensuring project deliverables met both business objectives and technical standards.
+● Contributed to a cross-functional team to align visions with engineering capabilities, ensuring project deliverables met both business objectives and technical standards.
 
 PROJECTS
 Swara OTT - AWS Serverless Architecture, Lambda functions, MongoDB, Next.js Jan 2022 – Dec 2023
