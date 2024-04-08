@@ -97,7 +97,6 @@ class JobDescriptionProcessor:
 
     def generate_questions_from_jd(self, job_description: str) -> List[dict]:
         category = self.job_category(job_description)
-        print(category)
         skills = self.extract_skills(job_description, category)
         questions = []
         for skill in skills[:5]:  # Generate questions for the first 5 skills

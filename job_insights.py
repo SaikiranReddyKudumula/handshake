@@ -1,25 +1,12 @@
-import os
-import spacy
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import os
-from dotenv import load_dotenv
 import spacy
 
 # Load the spaCy medium model
 nlp = spacy.load("en_core_web_md")
 
-def fetch_job_skills_from_api():
-    # Placeholder for actual API call
-    return {"python", "java", "javascript", "sql", "react", "UI/UX", "team communication", "Manage products"}
-
-
-def extract_skills_from_resume(resume_text):
-    # This function now just returns the resume text for further processing
-    return resume_text
 
 def calculate_similarity(skill1, skill2):
     return nlp(skill1).similarity(nlp(skill2))
+
 
 def find_matching_skills(resume_text, job_skills, similarity_threshold=0.7):
     resume_doc = nlp(resume_text.lower())
@@ -34,5 +21,6 @@ def find_matching_skills(resume_text, job_skills, similarity_threshold=0.7):
                 non_matching_skills.discard(job_skill)
                 break
 
-    match_percentage = (len(matching_skills) / len(job_skills)) * 100 if job_skills else 0
+    match_percentage = (len(matching_skills) /
+                        len(job_skills)) * 100 if job_skills else 0
     return matching_skills, non_matching_skills, match_percentage
