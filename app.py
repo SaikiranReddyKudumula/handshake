@@ -60,17 +60,10 @@ def get_questions():
         return jsonify({"error": str(e)}), 400
 
 
-@app.route('/submit-answer', methods=['GET'])
-def submit_answer():
+@app.route('/submit-answers', methods=['POST'])
+def submit_answers():
     # Assuming the format of the json is {'question':'answer'}
-    answers = {
-        "What does JDBC stand for?": "Sreeram",
-        "Which method is used to start a thread in Java?": "start()",
-        "What is the default transaction isolation level in JDBC?": "TRANSACTION_READ_COMMITTED",
-        # Incorrect for demonstration
-        "How can you retrieve the auto-generated keys after an INSERT statement in SQL?": "Using getGeneratedKeys() method of Statement object.",
-        "What is the main difference between 'INNER JOIN' and 'LEFT JOIN' in SQL?": "INNER JOIN returns rows when there is at least one match in both tables. LEFT JOIN returns all rows from the left table, and the matched rows from the right table; if there is no match, the result is NULL on the right side."  # Incorrect for demonstration
-    }
+    answers = request.get_json()
     result = validate.process_submitted_answers(answers)
     return result
 
@@ -81,7 +74,6 @@ def job_genie_answer():
         data = request.json
         question = data.get(
             'question')
-        # question = "What skills are required for this job?"
         answer = assistant.answer_question(
             question)
 
